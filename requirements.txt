@@ -13,6 +13,9 @@ torchaudio>=2.1.0
 onnxruntime-gpu>=1.16.0
 pyannote.audio>=3.1.1
 
+# ストレージ
+minio>=7.2.0
+
 # ユーティリティ
 pyyaml>=6.0.1
 python-dotenv>=1.0.0
