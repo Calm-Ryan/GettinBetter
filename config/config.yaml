@@ -31,6 +31,30 @@ transcription:
   min_segment_duration: 1.0   # 最小セグメント長（秒）
   max_merge_interval: 0.5     # 最大マージ間隔（秒）
 
+# 入力層設定
+input_layer:
+  validation:
+    max_file_size: 104857600  # 100MB
+    allowed_formats:
+      - wav
+      - mp3
+    max_duration: 3600  # 1時間
+    min_sample_rate: 16000
+    max_channels: 2
+    
+  storage:
+    type: "minio"
+    bucket: "audio-input"
+    endpoint: "http://localhost:9000"
+    access_key: "minioadmin"
+    secret_key: "minioadmin"
+    
+  queue:
+    max_queue_size: 1000
+    cleanup_interval: 3600  # 1時間
+    retry_count: 3
+    retry_delay: 5  # 秒
+
 # システム設定
 system:
   # GPUメモリ設定
