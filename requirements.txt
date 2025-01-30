@@ -1,0 +1,19 @@
+# 音声処理
+librosa>=0.10.1
+soundfile>=0.12.1
+numpy>=1.24.0
+scipy>=1.10.0
+webrtcvad>=2.0.10
+rnnoise>=0.4.0
+
+# 音声認識
+faster-whisper>=0.9.0
+torch>=2.1.0
+torchaudio>=2.1.0
+onnxruntime-gpu>=1.16.0
+pyannote.audio>=3.1.1
+
+# ユーティリティ
+pyyaml>=6.0.1
+python-dotenv>=1.0.0
+tqdm>=4.66.1
