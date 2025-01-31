@@ -13,8 +13,27 @@ torchaudio>=2.1.0
 onnxruntime-gpu>=1.16.0
 pyannote.audio>=3.1.1
 
+# テキスト解析
+sudachipy>=0.6.7
+sudachidict-core>=20230927
+transformers>=4.35.0
+scikit-learn>=1.3.2
+fugashi>=1.3.0
+ipadic>=1.0.0
+gensim>=4.3.2  # トピックモデリング用
+spacy>=3.7.2   # TextRank実装用
+ja-core-news-lg>=3.7.0  # 日本語SpaCyモデル
+ray>=2.9.0    # 分散処理用
+dask>=2024.1.0  # 分散処理用
+networkx>=3.2.1  # TextRank用
+sentence-transformers>=2.2.2  # 文埋め込み用
+
 # ストレージ
 minio>=7.2.0
+asyncpg>=0.29.0  # PostgreSQL非同期クライアント
+alembic>=1.13.1  # データベースマイグレーション
+redis>=5.0.1    # キャッシュ管理
+prometheus-client>=0.19.0  # メトリクス収集
 
 # ユーティリティ
 pyyaml>=6.0.1
