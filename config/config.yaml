@@ -1,94 +1,163 @@
-# 音声認識システム設定
+# テキスト解析設定
+text_analysis:
+  # 形態素解析設定
+  morphological:
+    mode: "C"  # Sudachiの分割モード（A: 短い, B: 中間, C: 長い）
+    pos_filters:  # 抽出する品詞
+      - "名詞"
+      - "動詞"
+      - "形容詞"
+      - "副詞"
+    normalize_text: true  # テキスト正規化を実行
+    use_sudachi: true    # Sudachi形態素解析器を使用
+
+  # キーワード抽出設定
+  keyword:
+    max_features: 1000   # 最大特徴数
+    max_keywords: 20     # 抽出するキーワード数
+    min_df: 2           # 最小文書頻度
+    max_df: 0.95        # 最大文書頻度（比率）
+    stop_words: "japanese"  # ストップワード
+    use_idf: true       # IDF重み付けを使用
+    
+    # ハイブリッドアプローチの設定
+    algorithm_weights:
+      tfidf: 0.3       # TF-IDFの重み
+      bert: 0.4        # BERTの重み
+      textrank: 0.3    # TextRankの重み
+    
+    bert_model: "rinna/japanese-roberta-base"  # 文埋め込みモデル
+    
+    # TextRank設定
+    textrank:
+      window_size: 4   # 共起ウィンドウサイズ
+      damping: 0.85    # ダンピング係数
+      min_diff: 1e-5   # 収束閾値
+      iterations: 30   # 最大反復回数
+
+  # センチメント分析設定
+  sentiment:
+    model_name: "rinna/japanese-roberta-base"  # 基本モデル
+    max_length: 512     # 最大トークン長
+    batch_size: 16      # バッチサイズ
+    threshold: 0.5      # 感情判定の閾値
+    use_gpu: true       # GPU使用
+    
+    # 感情カテゴリ
+    emotion_categories:
+      - "喜び"
+      - "悲しみ"
+      - "怒り"
+      - "恐れ"
+      - "驚き"
+      - "嫌悪"
+    
+    # 感情強度の重み
+    intensity_weights:
+      とても: 1.5
+      かなり: 1.3
+      やや: 0.7
+      すこし: 0.5
+      ほんの: 0.3
+    
+    # マルチモーダル設定
+    multimodal:
+      text_embedding_dim: 768
+      audio_feature_dim: 128
+      fusion_hidden_dim: 256
+      attention_heads: 4
+      dropout: 0.1
+      use_attention: true
+
+  # トピック分析設定
+  topic:
+    num_topics: 10      # トピック数
+    update_every: 1     # 更新頻度
+    passes: 20          # 学習パス数
+    alpha: "auto"       # トピック分布のハイパーパラメータ
+    eta: "auto"         # 単語分布のハイパーパラメータ
+    min_prob: 0.01      # 最小確率閾値
+    
+    # コヒーレンス設定
+    coherence:
+      metric: "c_v"    # コヒーレンス指標
+      topn: 20         # 評価する上位単語数
+    
+    # 辞書設定
+    dictionary:
+      no_below: 5      # 最小文書頻度
+      no_above: 0.5    # 最大文書頻度（比率）
+      keep_n: 100000   # 保持する語彙数
+
+  # 分散処理設定
+  distributed:
+    ray:
+      num_cpus: 4      # 使用CPU数
+      num_gpus: 1      # 使用GPU数
+      memory_limit: "8G"  # メモリ制限
+    
+    dask:
+      n_workers: 4     # ワーカー数
+      threads_per_worker: 2  # ワーカーあたりのスレッド数
+      memory_limit: "2G"  # ワーカーあたりのメモリ制限
+
+  # キャッシュ設定
+  cache:
+    max_size: 1000      # 最大キャッシュサイズ
+    ttl: 3600          # キャッシュ有効期間（秒）
+    cleanup_interval: 300  # クリーンアップ間隔（秒）
+    
+    # 分散キャッシュ設定
+    distributed_cache:
+      backend: "redis"  # キャッシュバックエンド
+      host: "localhost"
+      port: 6379
+      db: 0
+      password: null
 
 # 音声処理設定
 audio_processor:
-  sample_rate: 16000      # サンプリングレート（Hz）
-  max_duration: 30        # 最大セグメント長（秒）
-  vad_mode: 3            # VADの感度（0-3、3が最も感度が高い）
-  vad_frame_ms: 30       # VADフレーム長（ms）
-  min_speech_duration: 0.3  # 最小音声区間長（秒）
+  sample_rate: 16000
+  max_duration: 30
+  vad_mode: 3
+  vad_frame_ms: 30
+  min_speech_duration: 0.3
 
 # Whisper設定
 whisper:
-  model_name: "large-v3"  # 最新のWhisperモデル
-  device: "cuda"         # 実行デバイス（cuda or cpu）
-  compute_type: "float16"  # 計算精度
-  batch_size: 16         # バッチサイズ
-  language: "ja"         # 言語設定（日本語）
-  beam_size: 5          # ビームサーチのサイズ
-  word_timestamps: true  # 単語レベルのタイムスタンプを有効化
-  initial_prompt: "以下は日本語の音声を文字に起こしたものです。"  # 日本語用の初期プロンプト
+  model_name: "large-v3"
+  device: "cuda"
+  compute_type: "float16"
+  batch_size: 16
+  language: "ja"
+  beam_size: 5
+  word_timestamps: true
+  initial_prompt: "以下は日本語の音声を文字に起こしたものです。"
   
-  # ONNX最適化設定
-  use_onnx: true        # ONNXランタイムを使用
+  use_onnx: true
   onnx_optimization:
-    num_threads: 4      # 推論スレッド数
-    optimization_level: 3  # 最適化レベル（0-3）
-
-# 転写処理設定
-transcription:
-  confidence_threshold: 0.6   # 信頼度閾値
-  min_segment_duration: 1.0   # 最小セグメント長（秒）
-  max_merge_interval: 0.5     # 最大マージ間隔（秒）
-
-# 入力層設定
-input_layer:
-  validation:
-    max_file_size: 104857600  # 100MB
-    allowed_formats:
-      - wav
-      - mp3
-    max_duration: 3600  # 1時間
-    min_sample_rate: 16000
-    max_channels: 2
-    
-  storage:
-    type: "minio"
-    bucket: "audio-input"
-    endpoint: "http://localhost:9000"
-    access_key: "minioadmin"
-    secret_key: "minioadmin"
-    
-  queue:
-    max_queue_size: 1000
-    cleanup_interval: 3600  # 1時間
-    retry_count: 3
-    retry_delay: 5  # 秒
+    num_threads: 4
+    optimization_level: 3
 
 # システム設定
 system:
-  # GPUメモリ設定
   gpu_memory:
-    max_memory: "8G"      # 最大メモリ使用量
-    growth_rate: 0.7      # メモリ増加率
-    optimize_memory: true  # メモリ最適化を有効化
+    max_memory: "8G"
+    growth_rate: 0.7
+    optimize_memory: true
 
-  # 並列処理設定
   parallel:
-    max_workers: 4        # 最大ワーカー数
-    chunk_size: 1000      # チャンクサイズ
-
-# キャッシュ設定
-cache:
-  enabled: true
-  directory: "cache"
-  max_size: "1G"
-  ttl: 86400  # 24時間（秒）
+    max_workers: 4
+    chunk_size: 1000
 
 # 出力設定
 output:
-  format: "json"          # 出力フォーマット（json/txt）
-  save_intermediate: false  # 中間結果の保存
-  timestamp_format: "%H:%M:%S.%f"  # タイムスタンプフォーマット
-  include_word_timestamps: true  # 単語レベルのタイムスタンプを出力に含める
+  format: "json"
+  save_intermediate: false
+  timestamp_format: "%H:%M:%S.%f"
+  include_word_timestamps: true
 
-# エラーハンドリング設定
-error_handling:
-  max_retries: 3         # 最大リトライ回数
-  retry_delay: 1.0       # リトライ間隔（秒）
-  fallback_to_cpu: true  # GPU失敗時にCPUにフォールバック
-
-# パフォーマンスモニタリング設定
+# モニタリング設定
 monitoring:
   enabled: true
   metrics:
@@ -97,12 +166,7 @@ monitoring:
     - memory_usage
     - processing_time
     - transcription_accuracy
-    - vad_performance
-  log_interval: 60  # メトリクスログ間隔（秒）
-
-# 日本語特化の設定
-japanese:
-  use_sudachi: true  # Sudachi形態素解析器を使用
-  normalize_text: true  # テキスト正規化を実行
-  fix_particles: true  # 助詞の修正を実行
-  confidence_boost: 1.2  # 日本語認識時の信頼度ブースト
+    - text_analysis_performance
+    - sentiment_accuracy
+    - topic_coherence
+  log_interval: 60
